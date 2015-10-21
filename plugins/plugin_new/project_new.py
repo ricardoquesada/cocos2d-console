@@ -81,6 +81,7 @@ class CCPluginNew(cocos.CCPlugin):
             template_key = args.template_name
             if template_key in dic:
                 self._tpdir = dic[template_key]["path"]
+                self._lang = dic[template_key]["language"]
             else:
                 raise cocos.CCPluginError(
                     "Template name '%s' not found. Available templates: %s" %
