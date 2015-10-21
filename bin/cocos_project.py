@@ -10,7 +10,7 @@ class Project(object):
     JS = 'js'
 
     CONFIG = '.cocos-project.json'
-    PROJECT_FILE_EXTENSION = '.cocos2dproj'
+    PROJECT_FILE_EXTENSION = '.cocosproj'
 
     KEY_PROJ_TYPE = 'project_type'
     KEY_HAS_NATIVE = 'has_native'
