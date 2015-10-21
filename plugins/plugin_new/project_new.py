@@ -219,7 +219,7 @@ class CCPluginNew(cocos.CCPlugin):
         creator.do_default_step()
 
         data = None
-        cfg_path = os.path.join(self._projdir, cocos_project.Project.CONFIG)
+        cfg_path = os.path.join(self._projdir, self._projname + cocos_project.Project.PROJECT_FILE_EXTENSION)
         if os.path.isfile(cfg_path):
             f = open(cfg_path)
             data = json.load(f)

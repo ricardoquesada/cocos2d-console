@@ -8,6 +8,7 @@ import utils
 import modify_template
 import re
 import cocos
+import cocos_project
 
 from MultiLanguage import MultiLanguage
 from cocos import CCPluginError, Logging
@@ -237,7 +238,7 @@ class TemplateGenerator(cocos.CCPlugin):
             if not re.match(".*-template-binary", name):
                 continue
 
-            cfg_path = os.path.join(fullPath, ".cocos-project.json")
+            cfg_path = os.path.join(fullPath, name + cocos_project.Project.PROJECT_FILE_EXTENSION)
             cfg_info = {}
             if os.path.exists(cfg_path):
                 f = open(cfg_path)

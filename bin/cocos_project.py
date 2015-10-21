@@ -10,6 +10,7 @@ class Project(object):
     JS = 'js'
 
     CONFIG = '.cocos-project.json'
+    PROJECT_FILE_EXTENSION = '.cocos2dproj'
 
     KEY_PROJ_TYPE = 'project_type'
     KEY_HAS_NATIVE = 'has_native'
@@ -34,36 +35,40 @@ class Project(object):
         return (Project.CPP, Project.LUA, Project.JS)
 
     def __init__(self, project_dir):
+        # defaults
+        self._project_filepath = None
+        self._project_dir = None
+        self._project_lang = None
+
         # parse the config file
         self.info = self._parse_project_json(project_dir)
 
     def _parse_project_json(self, src_dir):
-        proj_path = self._find_project_dir(src_dir)
+        self._find_project_filepath(src_dir)
         # config file is not found
-        if proj_path == None:
+        if self._project_filepath is None:
             raise cocos.CCPluginError(MultiLanguage.get_string('PROJECT_CFG_NOT_FOUND_FMT',
                                       os.path.join(src_dir, Project.CONFIG)),
                                       cocos.CCPluginError.ERROR_PATH_NOT_FOUND)
 
-        project_json = os.path.join(proj_path, Project.CONFIG)
         try:
-            f = open(project_json)
+            f = open(self._project_filepath)
             project_info = json.load(f)
             f.close()
         except Exception:
             if f is not None:
                 f.close()
             raise cocos.CCPluginError(MultiLanguage.get_string('PROJECT_CFG_BROKEN_FMT',
-                                      project_json),
+                                      self._project_filepath),
                                       cocos.CCPluginError.ERROR_PARSE_FILE)
 
         if project_info is None:
             raise cocos.CCPluginError(MultiLanguage.get_string('PROJECT_CFG_PARSE_FAILED_FMT',
-                                      Project.CONFIG), cocos.CCPluginError.ERROR_PARSE_FILE)
+                                      self._project_filepath), cocos.CCPluginError.ERROR_PARSE_FILE)
 
         if not project_info.has_key(Project.KEY_PROJ_TYPE):
             raise cocos.CCPluginError(MultiLanguage.get_string('PROJECT_CFG_GET_VALUE_FAILED_FMT',
-                                      (Project.KEY_PROJ_TYPE, Project.CONFIG)),
+                                      (Project.KEY_PROJ_TYPE, self._project_filepath)),
                                       cocos.CCPluginError.ERROR_WRONG_CONFIG)
 
         lang = project_info[Project.KEY_PROJ_TYPE]
@@ -75,8 +80,7 @@ class Project(object):
                                       (Project.KEY_PROJ_TYPE, ', '.join(Project.list_for_display()))),
                                       cocos.CCPluginError.ERROR_WRONG_CONFIG)
 
-        # record the dir & language of the project
-        self._project_dir = proj_path
+        # language of the project
         self._project_lang = lang
 
         # if is script project, record whether it has native or not
@@ -112,8 +116,9 @@ class Project(object):
             cocos.Logging.warning(MultiLanguage.get_string('PROJECT_WARNING_CUSTOM_STEP_FAILED_FMT', e))
             raise e
 
-    def _find_project_dir(self, start_path):
+    def _find_project_filepath(self, start_path):
         path = start_path
+        project_name = os.path.basename(path)
         while True:
             if cocos.os_is_win32():
                 # windows root path, eg. c:\
@@ -123,17 +128,23 @@ class Project(object):
                 # unix like use '/' as root path
                 if path == '/' :
                     break
-            cfg_path = os.path.join(path, Project.CONFIG)
-            if (os.path.exists(cfg_path) and os.path.isfile(cfg_path)):
-                return path
+            cfg_path_old = os.path.join(path, Project.CONFIG)
+            cfg_path_new = os.path.join(path, project_name + Project.PROJECT_FILE_EXTENSION)
+            if (os.path.exists(cfg_path_old) and os.path.isfile(cfg_path_old)):
+                self._project_filepath = cfg_path_old
+                self._project_dir = path
+                return True
+            elif (os.path.exists(cfg_path_new) and os.path.isfile(cfg_path_new)):
+                self._project_filepath = cfg_path_new
+                self._project_dir = path
+                return True
 
             path = os.path.dirname(path)
 
-        return None
+        return False
 
     def get_proj_config(self, key):
-        project_json = os.path.join(self._project_dir, Project.CONFIG)
-        f = open(project_json)
+        f = open(self._project_filepath)
         project_info = json.load(f)
         f.close()
 
@@ -144,10 +155,8 @@ class Project(object):
         return ret
 
     def write_proj_config(self, key, value):
-        project_json = os.path.join(self._project_dir, Project.CONFIG)
-
-        if os.path.isfile(project_json):
-            f = open(project_json)
+        if os.path.isfile(self._project_filepath):
+            f = open(self._project_filepath)
             project_info = json.load(f)
             f.close()
 
@@ -156,8 +165,8 @@ class Project(object):
 
         project_info[key] = value
 
-        outfile = open(project_json, "w")
-        json.dump(project_info, outfile, sort_keys = True, indent = 4)
+        outfile = open(self._project_filepath, "w")
+        json.dump(project_info, outfile, sort_keys=True, indent=4)
         outfile.close()
 
     def get_project_dir(self):
