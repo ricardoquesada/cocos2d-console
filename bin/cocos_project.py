@@ -126,7 +126,7 @@ class Project(object):
                     break
             else:
                 # unix like use '/' as root path
-                if path == '/' :
+                if path == '/':
                     break
             cfg_path_old = os.path.join(path, Project.CONFIG)
             cfg_path_new = os.path.join(path, project_name + Project.PROJECT_FILE_EXTENSION)

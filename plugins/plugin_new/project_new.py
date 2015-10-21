@@ -254,6 +254,10 @@ class CCPluginNew(cocos.CCPlugin):
         with open(cfg_path, 'w') as outfile:
             json.dump(data, outfile, sort_keys=True, indent=4)
 
+            # FIXME: Does not work on Windows
+            # generate symlink for backward compatible
+            os.symlink(cfg_path, os.path.join(self._projdir, cocos_project.Project.CONFIG))
+
     # main entry point
     def run(self, argv, dependencies):
         self.parse_args(argv)

@@ -252,6 +252,10 @@ class TemplateGenerator(cocos.CCPlugin):
             json.dump(cfg_info, f, sort_keys=True, indent=4)
             f.close()
 
+            # FIXME: Does not work on Windows
+            # generate symlink for backward compatible
+            os.symlink(cfg_path, os.path.join(fullPath, cocos_project.Project.CONFIG))
+
     def rm_copy_res(self, file_path, keyword):
         f = open(file_path)
         info = json.load(f)
