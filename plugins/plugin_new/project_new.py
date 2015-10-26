@@ -23,6 +23,10 @@ import utils
 from collections import OrderedDict
 from MultiLanguage import MultiLanguage
 
+
+# directory which has the metadata
+TEMPLATE_METADATA_DIR = "metadata"
+
 #
 # Plugins should be a sublass of CCJSPlugin
 #
@@ -305,11 +309,11 @@ class Templates(object):
             except Exception:
                 continue
 
-        # if dir contains the template_metadata.json file, then it is a valid template
+        # if dir contains the metadata/config.json file, then it is a valid template
         valid_templates = {}
         for d in dirs:
             try:
-                f = open(os.path.join(d, 'template_metadata', 'config.json'))
+                f = open(os.path.join(d, TEMPLATE_METADATA_DIR, 'config.json'))
                 # python dictionary
                 dictionary = json.load(f)
                 # append current path
@@ -407,8 +411,8 @@ class TPCreator(object):
         self.tp_dir = tp_dir
         self.tp_json = 'cocos-project-template.json'
 
-        # search in 'template_metadata' first
-        tp_json_path = os.path.join(tp_dir, 'template_metadata', self.tp_json)
+        # search in metadata dir first
+        tp_json_path = os.path.join(tp_dir, TEMPLATE_METADATA_DIR, self.tp_json)
         if not os.path.exists(tp_json_path):
             # if not, search in the old place
             tp_json_path = os.path.join(tp_dir, self.tp_json)
