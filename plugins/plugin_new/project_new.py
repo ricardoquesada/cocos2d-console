@@ -260,7 +260,11 @@ class CCPluginNew(cocos.CCPlugin):
 
             # FIXME: Does not work on Windows
             # generate symlink for backward compatible
-            os.symlink(cfg_path, os.path.join(self._projdir, cocos_project.Project.CONFIG))
+            try:
+                os.symlink(cfg_path, os.path.join(self._projdir, cocos_project.Project.CONFIG))
+            except AttributeError:
+                # symlink doesn't exist on Windows
+                shutil.copy2(cfg_path, os.path.join(self._projdir, cocos_project.Project.CONFIG))
 
     # main entry point
     def run(self, argv, dependencies):

@@ -3,6 +3,7 @@
 
 import os
 import sys
+import shutil
 import json
 import utils
 import modify_template
@@ -254,7 +255,12 @@ class TemplateGenerator(cocos.CCPlugin):
 
             # FIXME: Does not work on Windows
             # generate symlink for backward compatible
-            os.symlink(cfg_path, os.path.join(fullPath, cocos_project.Project.CONFIG))
+            try:
+                os.symlink(cfg_path, os.path.join(fullPath, cocos_project.Project.CONFIG))
+            except AttributeError:
+                # symlink doesn't exist on Windows
+                shutil.copy2(cfg_path, os.path.join(fullPath, cocos_project.Project.CONFIG))
+
 
     def rm_copy_res(self, file_path, keyword):
         f = open(file_path)
