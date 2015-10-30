@@ -257,6 +257,7 @@ class CCPluginNew(cocos.CCPlugin):
         # write config files
         with open(cfg_path, 'w') as outfile:
             json.dump(data, outfile, sort_keys=True, indent=4)
+            outfile.close()
 
             # FIXME: Does not work on Windows
             # generate symlink for backward compatible
