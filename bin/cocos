@@ -1,4 +1,4 @@
-#!/bin/bash -l
+#!/bin/sh
 
 COCOS_CONSOLE_BIN_DIRECTORY=$(dirname "$0")
 COCOS_CONSOLE_BIN_DIRECTORY=$(cd "$COCOS_CONSOLE_BIN_DIRECTORY" && pwd -P)
